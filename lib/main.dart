@@ -27,12 +27,15 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  static const methodChannel = MethodChannel('com.julow.barometer/method');
+  static const methodChannel = MethodChannel('com.gb.accelerometer/method');
   static const pressureChannel = EventChannel('com.julow.barometer/pressure');
+  static const accelerometerChannel = EventChannel('com.gb.accelerometer/motion');
 
   String _sensorAvailable = 'Unknown';
   double _pressureReading = 0;
+  double _accelerometerReading = 0;
   StreamSubscription pressureSubscription;
+  StreamSubscription accelerometerSubscription;
 
   Future<void> _checkAvailability() async {
     try {
@@ -46,19 +49,19 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   _startReading() {
-    pressureSubscription =
-        pressureChannel.receiveBroadcastStream().listen((event) {
+    accelerometerSubscription =
+        accelerometerChannel.receiveBroadcastStream().listen((event) {
       setState(() {
-        _pressureReading = event;
+        _accelerometerReading = event;
       });
     });
   }
 
   _stopReading() {
     setState(() {
-      _pressureReading = 0;
+      _accelerometerReading = 0;
     });
-    pressureSubscription.cancel();
+    accelerometerSubscription.cancel();
   }
 
   @override
@@ -76,13 +79,12 @@ class _MyHomePageState extends State<MyHomePage> {
             SizedBox(
               height: 50.0,
             ),
-            if (_pressureReading != 0)
-              Text('Sensor Reading : $_pressureReading'),
-            if (_sensorAvailable == 'true' && _pressureReading == 0)
+            if (_accelerometerReading != 0)
+              Text('Sensor Reading : $_accelerometerReading'),
               ElevatedButton(
                   onPressed: () => _startReading(),
                   child: Text('Start Reading')),
-            if (_pressureReading != 0)
+            if (_accelerometerReading != 0)
               ElevatedButton(
                   onPressed: () => _stopReading(), child: Text('Stop Reading'))
           ],

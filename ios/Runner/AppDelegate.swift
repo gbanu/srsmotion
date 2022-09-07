@@ -2,6 +2,7 @@ import UIKit
 import Flutter
 import CoreMotion
 
+@available(iOS 14.0, *)
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
   override func application(
@@ -9,9 +10,10 @@ import CoreMotion
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
 
-    let METHOD_CHANNEL_NAME = "com.julow.barometer/method"
-    let PRESSURE_CHANNEL_NAME = "com.julow.barometer/pressure"
+    let METHOD_CHANNEL_NAME = "com.gb.accelerometer/method"
+    let MOTION_CHANNEL_NAME = "com.gb.accelerometer/motion"
     let pressureStreamHandler = PressureStreamHandler()
+    let motionStreamHandler = MotionStreamHandler()
     
     let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
     
@@ -21,13 +23,17 @@ import CoreMotion
         (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
         switch call.method {
         case "isSensorAvailable":
-            result(CMAltimeter.isRelativeAltitudeAvailable())
+            result(CMHeadphoneMotionManager.authorizationStatus)
+            
         default:
             result(FlutterMethodNotImplemented)
         }
     })
+      
+      let motionChannel = FlutterEventChannel(name: MOTION_CHANNEL_NAME, binaryMessenger: controller.binaryMessenger)
+      motionChannel.setStreamHandler(motionStreamHandler)
     
-    let pressureChannel = FlutterEventChannel(name: PRESSURE_CHANNEL_NAME, binaryMessenger: controller.binaryMessenger)
+    let pressureChannel = FlutterEventChannel(name: MOTION_CHANNEL_NAME, binaryMessenger: controller.binaryMessenger)
     pressureChannel.setStreamHandler(pressureStreamHandler)
     
     GeneratedPluginRegistrant.register(with: self)
